@@ -215,6 +215,23 @@ This does most of the completion work scanning the buffer
                         (car pair))  (cdr result))
             (try-completion string (cdr result) predicate)))))))
 
+;;;###autoload
+(defcustom java-complete-do-init nil
+  "Whether to java-complete-jack-in on load or not."
+  :type 'boolean
+  :group 'java-complete)
+
+;;;###autoload
+(defun java-complete-jack-in ()
+  (add-hook
+   'java-mode-hook
+   (lambda () (local-set-key (kbd "C-<tab>") 'java-complete))))
+
+;;;###autoload
+(eval-after-load 'java-complete
+  (when (and (boundp 'java-complete-do-init)
+             (symbol-value 'java-complete-do-init))
+    (java-complete-jack-in)))
 
 (provide 'java-complete)
 
