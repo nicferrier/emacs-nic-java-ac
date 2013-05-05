@@ -26,5 +26,22 @@ When I'm completing I'd like to see nice status about what has been
 completed.
 
 
-This package was designed to fulfil those needs.
+== The approach ==
 
+The idea is to use a Java program to scan a classpath and introspect
+everything to give the information we need to do completion.
+
+We include a Java program called {{{Tags}}} (which is supplied in the
+package file if you install the package file) which you can call with
+the classpath of your program.
+
+Clearly we need to make this more integrated with builds, just like it
+is
+[[http://www.gnu.org/software/emacs/manual/html_node/emacs/Create-Tags-Table.html|with C code]].
+
+== Immediate todo ==
+
+* Namespace the tags program class
+* Run the tags program when the tags file doesn't exist
+** how does the tags program get the classpath of your project?
+* Make snippets of build code for integrating the Tags program?
