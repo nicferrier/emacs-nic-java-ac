@@ -1,0 +1,5 @@
+(java-complete
+ :doc "A tags based Java completion system."
+ :version "0.10"
+ :files ("java-complete.el"
+         "Tags.class"))
