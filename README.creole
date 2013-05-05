@@ -43,7 +43,7 @@ is
 
 === Compile the java ===
 
-{{{(M-x load-file tags-compile.el}}}
+{{{(M-x load-file tags-compile.el)}}}
 
 === Make the Java namespace tags file ===
 
