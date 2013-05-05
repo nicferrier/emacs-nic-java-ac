@@ -254,15 +254,19 @@ public class Tags
     return paramName;
   }
   
-  public static void main (String[] argv) throws Exception
-  {
-    Tags tags = new Tags();
-
-    if (argv.length > 0)
-      tags.packageFilter = argv[0];
-
-    tags.processClasspath(System.getProperty("java.class.path"));
-
-    System.exit(0);
+  public static void main (String[] argv) throws Exception {
+      Tags tags = new Tags();
+      
+      if (argv.length > 0) {
+          if (!argv[0].startsWith("@")) {
+              tags.packageFilter = argv[0];
+          }
+          else {
+              System.out.println("property: " + System.getProperty(argv[0].substring(1)));
+              System.exit(0);
+          }
+      }
+      tags.processClasspath(System.getProperty("java.class.path"));
+      System.exit(0);
   }
 }
