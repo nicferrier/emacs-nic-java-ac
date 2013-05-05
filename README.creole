@@ -39,6 +39,28 @@ Clearly we need to make this more integrated with builds, just like it
 is
 [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Create-Tags-Table.html|with C code]].
 
+== How To ==
+
+=== Compile the java ===
+
+{{{(M-x load-file tags-compile.el}}}
+
+=== Make the Java namespace tags file ===
+
+{{{java -cp . Tags "java.*" > ~/.java.tags}}}
+
+=== Report all system properties ===
+
+{{{java -cp . Tags @@}}}
+
+=== Report a system property ===
+
+{{{java -cp . Tags @sun.boot.class.path}}}
+
+=== Report the class path ===
+
+{{{java -cp . Tags @c}}}
+
 == Immediate todo ==
 
 * Namespace the tags program class
