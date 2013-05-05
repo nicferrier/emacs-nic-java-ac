@@ -16,8 +16,9 @@ I have always wanted 3 sorts of completion in Java:
 someVar.meth
 }}}
 
-2.1 find the type of {{{someVar}}}
-2.2 complete {{{meth}}} given the list of possible methods
+- find the type of {{{someVar}}}
+
+- complete {{{meth}}} given the list of possible methods
 
 3. complete package names in import statements
 
