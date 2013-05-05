@@ -158,26 +158,24 @@ tried: ~/.java.tags If that isn't found either then an error is
 signalled.
 
 Returns the tags buffer for the current file."
-  (flet ((mkfilename (dir name)
-           (file-truename (expand-file-name (concat dir name)))))
-    ;; Main func.
-    (with-current-buffer buffer
-      (if (bufferp java-complete-tags)
-          java-complete-tags
-          (let* ((project-root (java-complete-root buffer))
-                 (home-root (file-truename (expand-file-name "~/")))
-                 (tags-file
-                  (car-safe
-                   (or
-                    (directory-files project-root t "\\.java\\.tags")
-                    (directory-files home-root t "\\.java\\.tags")))))
-            ;; Visit any file found
-            (if tags-file
-                (with-current-buffer buffer
-                  (setq java-complete-tags
-                        (find-file-noselect tags-file)))
-                ;; Else 
-                (error "could not find a java tags file - make one?")))))))
+  ;; Main func.
+  (with-current-buffer buffer
+    (if (bufferp java-complete-tags)
+        java-complete-tags
+        (let* ((project-root (java-complete-root buffer))
+               (home-root (file-truename (expand-file-name "~/")))
+               (tags-file
+                (car-safe
+                 (or
+                  (directory-files project-root t "\\.java\\.tags")
+                  (directory-files home-root t "\\.java\\.tags")))))
+          ;; Visit any file found
+          (if tags-file
+              (with-current-buffer buffer
+                (setq java-complete-tags
+                      (find-file-noselect tags-file)))
+              ;; Else 
+              (error "could not find a java tags file - make one?"))))))
 
 (defun java-completer (string predicate all-completions)
   "Ccomplete STRING with PREDICATE using ALL-COMPLETIONS.
