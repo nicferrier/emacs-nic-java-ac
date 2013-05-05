@@ -24,6 +24,10 @@
 
 ;;; Code:
 
+(defgroup java-complete nil
+  "Completion via tags for Java."
+  :group 'java)
+
 (defvar java-complete-class-p 't
   "A switch that controls the completer.
 If it's true then the completer does class completion, if false
@@ -111,46 +115,75 @@ This is used to search across everything that a file imports.")
     (save-match-data
       (save-excursion
         (beginning-of-buffer)
-        (let ((class-start (save-excursion
-                             (re-search-forward "^.* \\(class \\|interface \\)" nil 't))))
+        (let ((class-start
+               (save-excursion
+                 (re-search-forward "^.* \\(class \\|interface \\)" nil 't))))
           (if (not class-start)
               (error "this not a java class or interface"))
           (while (re-search-forward "^import \\([a-z0-9.]+\\).*;" class-start 't)
             (setq regex (concat regex "\\|" (regexp-quote (match-string 1))))
             (end-of-line))))
-      (concat "\\(" regex "\\)")
-      )))
+      (concat "\\(" regex "\\)"))))
+
+
+(defvar java-complete-tags nil
+  "Buffer local tags file reference.")
+
+(make-local-variable 'java-complete-tags)
+
+(defcustom java-complete-build-file-names (list 
+                                           "pom.xml"
+                                           "build.xml")
+  "A list of filenames that might define the dominating file."
+  :group 'java-complete
+  :type '(repeat string))
+
+(defun java-complete-root (buffer)
+  "Find the project root of BUFFER, a Java file.
+
+The project root is the location of the pom.xml or the build.xml."
+  (or (locate-dominating-file (buffer-file-name buffer) "pom.xml")
+      (locate-dominating-file (buffer-file-name buffer) "build.xml")
+      (file-truename (concat (file-name-directory (buffer-file-name buffer)) ".."))))
 
 (defun java-complete-tags-finder (buffer &optional directory)
   "Find a java.tags file for the specified buffer.
-The buffer might have the variable java-completer-tag-buffer set.
-If so then the value of that is used. Otherwise the tag file is
-seacrhed for from the current directory towards the root.  If a
-tag file still isn't found then a user specific tags file is
-tried: ~/.java.tags
-If that isn't found either then an error is signalled."
-  (defun mkfilename (dir name)
-    (file-truename (expand-file-name (concat dir name))))
-  ;; Main func.
-  (let* ((dir1 (or directory (file-name-directory (buffer-file-name buffer))))
-         (dirlst (directory-files dir1)))
-    ;; Visit any file found
-    (if (and (member ".java.tags" dirlst)
-             (file-exists-p (mkfilename dir1 ".java.tags")))
-        (let ((buf (find-file-noselect (mkfilename dir1 ".java.tags"))))
-          (make-local-variable 'java-complete-tags)
-          (setq java-complete-tags buf))
-      (let ((parentdir (mkfilename dir1 "../")))
-        (if (not (equal "/" parentdir))
-            (java-complete-tags-finder buffer parentdir)
-          (if (file-exists-p "~/.java.tags")
-              (find-file-noselect "~/.java.tags")
-            (error "could not find a java tags file, consider making a user specific one?")))))))
 
+The buffer might have the variable `java-completer-tag-buffer'
+set.  If so then the value of that is used.  Otherwise the tag
+file is seacrhed for from the current directory towards the root.
+
+If a tag file still isn't found then a user specific tags file is
+tried: ~/.java.tags If that isn't found either then an error is
+signalled.
+
+Returns the tags buffer for the current file."
+  (flet ((mkfilename (dir name)
+           (file-truename (expand-file-name (concat dir name)))))
+    ;; Main func.
+    (with-current-buffer buffer
+      (if (bufferp java-complete-tags)
+          java-complete-tags
+          (let* ((project-root (java-complete-root buffer))
+                 (home-root (file-truename (expand-file-name "~/")))
+                 (tags-file
+                  (car-safe
+                   (or
+                    (directory-files project-root t "\\.java\\.tags")
+                    (directory-files home-root t "\\.java\\.tags")))))
+            ;; Visit any file found
+            (if tags-file
+                (with-current-buffer buffer
+                  (setq java-complete-tags
+                        (find-file-noselect tags-file)))
+                ;; Else 
+                (error "could not find a java tags file - make one?")))))))
 
 (defun java-completer (string predicate all-completions)
-  "The completer.
-This does most of the completion work scanning the buffer java.tags."
+  "Ccomplete STRING with PREDICATE using ALL-COMPLETIONS.
+
+This does most of the completion work scanning the buffer
+`java-complete-tags'."
   (save-excursion
     (save-match-data
       (with-current-buffer (java-complete-tags-finder (current-buffer))
