@@ -3,6 +3,13 @@
 ;; Copyright (C) 2013 Nic Ferrier
 ;; Copyright (C) 2004 Tapsell-Ferrier Limited
 
+;; Author: Nic Ferrier <nferrier@ferrier.me.uk>
+;; Maintainer: Nic Ferrier <nferrier@ferrier.me.uk>
+;; Created: 7th November 2004
+;; Keywords: lisp, http, hypermedia
+
+;; This file is NOT part of GNU Emacs.
+
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2, or (at your option)
