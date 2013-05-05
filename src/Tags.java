@@ -256,17 +256,33 @@ public class Tags
   
   public static void main (String[] argv) throws Exception {
       Tags tags = new Tags();
-      
+      String classPath = System.getProperty("java.class.path");
+      if (classPath.equals(".")) {
+          classPath = System.getProperty("sun.boot.class.path");
+      }
+
       if (argv.length > 0) {
           if (!argv[0].startsWith("@")) {
               tags.packageFilter = argv[0];
           }
           else {
-              System.out.println("property: " + System.getProperty(argv[0].substring(1)));
+              if (argv[0].equals("@@")) {
+                  Properties p = System.getProperties();
+                  p.list(System.out);
+              }
+              else if (argv[0].equals("@c")) {
+                  System.out.println("classPath = " + classPath);
+              }
+              else {
+                  System.out.println(
+                      "property: " 
+                      + System.getProperty(argv[0].substring(1)));
+              }
               System.exit(0);
           }
       }
-      tags.processClasspath(System.getProperty("java.class.path"));
+
+      tags.processClasspath(classPath);
       System.exit(0);
   }
 }
