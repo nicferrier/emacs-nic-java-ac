@@ -184,6 +184,22 @@ Returns the tags buffer for the current file."
               ;; Else 
               (error "could not find a java tags file - make one?"))))))
 
+(defun java-complete-make-package-rex (string)
+  ;; TODO would be better as rx?
+  (concat
+   "^"
+   java-complete-package-re
+   "\\(" (regexp-quote string) "[A-Za-z0-9_]*\\)$"))
+
+(defun java-complete-make-member-rex (string)
+  ;; TODO would be better as rx?
+  (concat
+   "^[ \t]*\\(public \\|protected \\|abstract \\|static \\|final \\)"
+   java-complete-package-re 
+   java-complete-class-name
+   "\\." ; the "." here ensures we catch only members (not constructors)
+   "\\(" (regexp-quote string) "[A-Za-z0-9]*\\)(.*)"))
+
 (defun java-completer (string predicate all-completions)
   "Ccomplete STRING with PREDICATE using ALL-COMPLETIONS.
 
@@ -191,20 +207,21 @@ This does most of the completion work scanning the buffer
 `java-complete-tags'."
   (save-excursion
     (save-match-data
-      (with-current-buffer (java-complete-tags-finder (current-buffer))
+      (with-current-buffer
+          (java-complete-tags-finder (current-buffer))
         (beginning-of-buffer)
         (let ((case-fold-search nil)
               (result (list '()))
               (re (if java-complete-class-p
-                      (concat "^" java-complete-package-re "\\(" (regexp-quote string) "[A-Za-z0-9_]*\\)$")
-                    ;; Else it's member completion
-                    (concat "^[ \t]*\\(public \\|protected \\|abstract \\|static \\|final \\)"
-                            java-complete-package-re 
-                            java-complete-class-name "\\." ; the "." here ensures we catch only members (not constructors)
-                            "\\(" (regexp-quote string) "[A-Za-z0-9]*\\)(.*)"))))
+                      (java-complete-make-package-rex string)
+                      ;; Else it's member completion
+                      (java-complete-make-member-rex string))))
           (while (re-search-forward re nil 't)
-            (nconc result (list (cons (match-string (if java-complete-class-p 2 3))
-                                      (match-string 0))))
+            (nconc result
+                   (list
+                    (cons
+                     (match-string (if java-complete-class-p 2 3))
+                     (match-string 0))))
             (end-of-line))
           ;; What we do with the result depends on whether we were called as
           ;; try-completion or as all-completions
