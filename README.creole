@@ -1,0 +1,29 @@
+= Java Completion =
+
+The state of Java stuff in Emacs is poor. But Emacs is experiencing a
+renaissance and I may have to do some Java programming in the near
+future, so I figured I should at least get some of my old Java stuff
+working.
+
+
+I have always wanted 3 sorts of completion in Java:
+
+1. complete a class name;  for when you're declaring variables
+
+2. complete a method call; given text:
+
+{{{
+someVar.meth
+}}}
+
+2.1 find the type of {{{someVar}}}
+2.2 complete {{{meth}}} given the list of possible methods
+
+3. complete package names in import statements
+
+When I'm completing I'd like to see nice status about what has been
+completed.
+
+
+This package was designed to fulfil those needs.
+
